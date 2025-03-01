@@ -1,132 +1,192 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { Search, Video, AlertCircle } from 'lucide-svelte';
-    import { PUBLIC_RTMP_STAT_URL } from '$env/static/public';
-    
-    let streams: string[] = [];
-    let isLoading = true;
-    let error = '';
-    let searchQuery = '';
-    
-    $: filteredStreams = streams.filter(stream => 
-      stream.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    
-    onMount(async () => {
-      try {
-        // Attempt to access NGINX RTMP server stats
-        const response = await fetch(PUBLIC_RTMP_STAT_URL);
-        
-        if (response.ok) {
-          const text = await response.text();
-          // Simple regex to find stream names in rtmp stat XML
-          const matches = text.match(/name="([^"]+)"/g);
-          if (matches) {
-            streams = matches
-              .map(m => m.replace('name="', '').replace('"', ''))
-              .filter(n => n !== 'live'); // Filter out application name
-          }
-        } else {
-          error = 'Failed to load streams. Server returned: ' + response.status;
-        }
-      } catch (e) {
-        error = 'Error connecting to RTMP server stats';
-        console.error(e);
-      } finally {
-        isLoading = false;
-      }
-    });
+	import { isAuthenticated, user } from '$lib/auth';
 </script>
 
 <svelte:head>
-  <title>HLS Player - Low Latency Streams</title>
+	<title>Home</title>
 </svelte:head>
 
-<div class="mx-auto max-w-6xl">
-  <header class="mb-8">
-    <h1 class="mb-4 text-3xl font-bold md:text-4xl">Low-Latency HLS Streamy</h1>
-    <p class="text-gray-400">Streamujte obsah s extrémne nízkou latenciou</p>
-  </header>
-  
-  {#if isLoading}
-    <div class="flex h-64 items-center justify-center">
-      <div
-        class="h-10 w-10 animate-spin rounded-full border-4 border-red-500 border-t-transparent"
-      ></div>
-    </div>
-  {:else if error}
-    <div class="flex items-start gap-4 rounded-lg border border-red-800 bg-red-900/30 p-6">
-      <AlertCircle class="mt-1 flex-shrink-0 text-red-500" size={24} />
-      <div>
-        <h2 class="mb-2 text-xl font-semibold text-red-400">Chyba pripojenia</h2>
-        <p class="mb-4 text-gray-300">{error}</p>
-        <div class="mb-4 rounded-lg bg-gray-800 p-4">
-          <p class="mb-2 text-gray-300">
-            Môžete stále pristupovať k streamom priamo zadaním názvu streamu v URL:
-          </p>
-          <code class="block rounded bg-gray-900 p-2 font-mono text-sm"
-            >http://localhost:3000/[stream-name]</code
-          >
-        </div>
-      </div>
-    </div>
-  {:else}
-    <div class="relative mb-6">
-      <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-        <Search size={20} class="text-gray-400" />
-      </div>
-      <input
-        type="text"
-        bind:value={searchQuery}
-        placeholder="Hľadať streamy..."
-        class="w-full rounded-lg border border-gray-700 bg-gray-800 py-2 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-      />
-    </div>
-    
-    {#if streams.length === 0}
-      <div class="rounded-lg border border-gray-700 bg-gray-800/50 p-6">
-        <h2 class="mb-4 flex items-center gap-2 text-xl font-semibold">
-          <Video size={24} />
-          Žiadne aktívne streamy
-        </h2>
-        <p class="mb-4 text-gray-300">
-          Momentálne nie sú dostupné žiadne streamy. Začnite streamovať pomocou RTMP:
-        </p>
-        <div class="mb-4 rounded-lg bg-gray-800 p-3">
-          <code class="font-mono text-sm">rtmp://localhost:1935/live/[nazov-streamu]</code>
-        </div>
-        <p class="mb-2 text-gray-300">Potom navštívte:</p>
-        <div class="rounded-lg bg-gray-800 p-3">
-          <code class="font-mono text-sm">http://localhost:3000/[nazov-streamu]</code>
-        </div>
-      </div>
-    {:else}
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {#each filteredStreams as stream}
-          <a
-            href="/{stream}"
-            class="flex flex-col overflow-hidden rounded-lg bg-gray-800 transition-colors hover:bg-gray-700"
-          >
-            <div class="flex aspect-video items-center justify-center bg-gray-900">
-              <Video size={48} class="text-gray-600" />
-            </div>
-            <div class="p-4">
-              <h3 class="truncate text-xl font-semibold">{stream}</h3>
-              <p class="text-sm text-gray-400">Live Stream</p>
-            </div>
-          </a>
-        {/each}
-      </div>
-      
-      {#if filteredStreams.length === 0 && searchQuery}
-        <div class="py-12 text-center text-gray-400">
-          <p>Žiadne streamy nezodpovedajú vyhľadávaniu "{searchQuery}"</p>
-        </div>
-      {/if}
-    {/if}
-  {/if}
-  
-  <footer class="mt-16 border-t border-gray-800 pt-6 text-sm text-gray-500">
-    <p>NVIDIA NVENC Accelerated LL-HLS Player</p>
-  </footer>
+<div class="bg-white">
+	<div class="relative isolate px-6 pt-14 lg:px-8">
+		<div class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+			<div
+				class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-blue-400 to-purple-600 opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+				style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
+			></div>
+		</div>
+
+		<div class="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+			<div class="text-center">
+				<h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+					Secure Authentication for Your Applications
+				</h1>
+				<p class="mt-6 text-lg leading-8 text-gray-600">
+					A complete authentication solution with OAuth social logins, secure session management,
+					and easy integration.
+				</p>
+				<div class="mt-10 flex items-center justify-center gap-x-6">
+					{#if $isAuthenticated}
+						<a
+							href="/protected"
+							class="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+						>
+							View Protected Page
+						</a>
+						<a href="/account" class="text-sm leading-6 font-semibold text-gray-900">
+							Manage Account <span aria-hidden="true">→</span>
+						</a>
+					{:else}
+						<a
+							href="/register"
+							class="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+						>
+							Get Started
+						</a>
+						<a href="/login" class="text-sm leading-6 font-semibold text-gray-900">
+							Sign In <span aria-hidden="true">→</span>
+						</a>
+					{/if}
+				</div>
+			</div>
+		</div>
+
+		<div
+			class="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
+		>
+			<div
+				class="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-blue-500 to-purple-500 opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+				style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"
+			></div>
+		</div>
+	</div>
+
+	<!-- Features section -->
+	<div class="py-24 sm:py-32">
+		<div class="mx-auto max-w-7xl px-6 lg:px-8">
+			<div class="mx-auto max-w-2xl lg:text-center">
+				<h2 class="text-base leading-7 font-semibold text-blue-600">Authentication Made Easy</h2>
+				<p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+					Everything you need for secure user authentication
+				</p>
+				<p class="mt-6 text-lg leading-8 text-gray-600">
+					Our authentication system provides a complete solution for user authentication, with
+					multiple login options, secure session management, and easy integration.
+				</p>
+			</div>
+			<div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
+				<dl
+					class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16"
+				>
+					<div class="relative pl-16">
+						<dt class="text-base leading-7 font-semibold text-gray-900">
+							<div
+								class="absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600"
+							>
+								<svg
+									class="h-6 w-6 text-white"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
+									/>
+								</svg>
+							</div>
+							Social Logins
+						</dt>
+						<dd class="mt-2 text-base leading-7 text-gray-600">
+							Enable users to log in using their Google, Discord, or GitHub accounts with OAuth 2.0
+							integration.
+						</dd>
+					</div>
+					<div class="relative pl-16">
+						<dt class="text-base leading-7 font-semibold text-gray-900">
+							<div
+								class="absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600"
+							>
+								<svg
+									class="h-6 w-6 text-white"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+									/>
+								</svg>
+							</div>
+							Secure Session Management
+						</dt>
+						<dd class="mt-2 text-base leading-7 text-gray-600">
+							JWT tokens, refresh tokens, and secure cookies for seamless and secure session
+							management across devices.
+						</dd>
+					</div>
+					<div class="relative pl-16">
+						<dt class="text-base leading-7 font-semibold text-gray-900">
+							<div
+								class="absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600"
+							>
+								<svg
+									class="h-6 w-6 text-white"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+									/>
+								</svg>
+							</div>
+							Enhanced Security
+						</dt>
+						<dd class="mt-2 text-base leading-7 text-gray-600">
+							Protected against CSRF, XSS, and session hijacking with secure headers, HTTPS
+							enforcement, and token validation.
+						</dd>
+					</div>
+					<div class="relative pl-16">
+						<dt class="text-base leading-7 font-semibold text-gray-900">
+							<div
+								class="absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600"
+							>
+								<svg
+									class="h-6 w-6 text-white"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
+									/>
+								</svg>
+							</div>
+							Easy Integration
+						</dt>
+						<dd class="mt-2 text-base leading-7 text-gray-600">
+							Simple to integrate with your existing Svelte applications using our pre-built
+							components and middleware.
+						</dd>
+					</div>
+				</dl>
+			</div>
+		</div>
+	</div>
 </div>

@@ -404,16 +404,7 @@
 	<title>Live Stream - {streamName || 'Not Found'}</title>
 </svelte:head>
 
-<div class="mx-auto max-w-6xl">
-	<div class="mb-4">
-		<a
-			href="/"
-			class="inline-flex items-center gap-1 text-gray-400 transition-colors hover:text-white"
-		>
-			&larr; Späť na zoznam streamov
-		</a>
-	</div>
-
+<div class="mx-auto max-w-6xl pt-4">
 	{#if !streamName}
 		<div class="rounded-lg border border-red-800 bg-red-900/30 p-6">
 			<h2 class="mb-2 text-xl font-semibold text-red-400">Stream nenájdený</h2>
