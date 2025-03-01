@@ -1,0 +1,18 @@
+networks:
+  traefik-network:
+    external: true
+  internal-network:
+    driver: bridge
+    internal: true
+
+services:
+  play:
+    build: .
+    environment:
+      NODE_ENV: production
+    expose:
+      - "3000"
+    networks:
+      - traefik-network
+      - internal-network
+    restart: always
