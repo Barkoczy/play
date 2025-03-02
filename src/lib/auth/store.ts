@@ -1,4 +1,3 @@
-import { NODE_ENV } from '$env/static/private';
 import { browser } from '$app/environment';
 import type { Cookies } from '@sveltejs/kit';
 import { writable, derived } from 'svelte/store';
@@ -8,7 +7,7 @@ import type { UserProfile } from './types';
 const COOKIE_CONFIG = {
     path: '/',
     httpOnly: true,
-    secure: NODE_ENV === 'production',
+    secure: true,
     sameSite: 'lax',
     maxAge: 60 * 60 * 24 // 1 day in seconds
 } as const;

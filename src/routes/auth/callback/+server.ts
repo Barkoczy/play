@@ -1,4 +1,4 @@
-import { NODE_ENV, CLIENT_SECRET } from '$env/static/private';
+import { CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_AUTH_API_URL } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -72,7 +72,7 @@ export const GET: RequestHandler = async ({ url, fetch, cookies }) => {
 		cookies.set('auth_token', decodedData.accessToken, {
 			path: '/',
 			httpOnly: true,
-			secure: NODE_ENV === 'production',
+			secure: true,
 			sameSite: 'lax',
 			maxAge: 60 * 60 * 24, // 1 day
 		});
