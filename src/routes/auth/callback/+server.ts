@@ -1,14 +1,13 @@
-import { CLIENT_SECRET } from '$env/static/private';
+import { NODE_ENV, CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_AUTH_API_URL } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { SecureTokenStorage } from '$lib/auth/secureTokenStorage';
 import { createHmacSignature } from '$lib/utils/crypto';
 
 // Handle OAuth callback
-export const GET: RequestHandler = async ({ url, fetch }) => {
+export const GET: RequestHandler = async ({ url, fetch, cookies }) => {
 	// Clear existing tokens
-    SecureTokenStorage.removeToken('accessToken');
+	cookies.delete('auth_token', { path: '/' });
 
 	// Check for success and key parameters
 	const success = url.searchParams.get('success');
@@ -70,7 +69,13 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 
 	// Store tokens in cookies
 	if (decodedData.accessToken) {
-        SecureTokenStorage.setToken('accessToken', decodedData.accessToken);
+		cookies.set('auth_token', decodedData.accessToken, {
+			path: '/',
+			httpOnly: true,
+			secure: NODE_ENV === 'production',
+			sameSite: 'lax',
+			maxAge: 60 * 60 * 24, // 1 day
+		});
 	}
 
 	// Redirect based on whether it's a new user or not

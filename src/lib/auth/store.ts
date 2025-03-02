@@ -1,6 +1,23 @@
+import { NODE_ENV } from '$env/static/private';
+import { browser } from '$app/environment';
+import type { Cookies } from '@sveltejs/kit';
 import { writable, derived } from 'svelte/store';
 import type { UserProfile } from './types';
-import { SecureTokenStorage } from './secureTokenStorage';
+
+// Cookie configuration
+const COOKIE_CONFIG = {
+    path: '/',
+    httpOnly: true,
+    secure: NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 // 1 day in seconds
+} as const;
+
+// Cookie names
+const COOKIE_NAMES = {
+    accessToken: 'auth_token',
+    refreshToken: 'refresh_token'
+};
 
 // Define initial state
 type AuthState = {
@@ -71,25 +88,71 @@ export const isAuthenticated = derived(authStore, ($authStore) => $authStore.isA
 export const isLoading = derived(authStore, ($authStore) => $authStore.isLoading);
 export const authError = derived(authStore, ($authStore) => $authStore.error);
 
-// Helper function to persist tokens using SecureTokenStorage
-export const storeTokens = (tokens: { accessToken: string; refreshToken?: string }) => {
-    if (tokens.accessToken) {
-        SecureTokenStorage.setToken('accessToken', tokens.accessToken);
-    }
-    if (tokens.refreshToken) {
-        SecureTokenStorage.setToken('refreshToken', tokens.refreshToken);
+// Helper function to persist tokens using cookies
+export const storeTokens = (tokens: { accessToken: string; refreshToken?: string }, cookies?: Cookies) => {
+    if (browser && !cookies) {
+        // Client-side storage using document.cookie
+        if (tokens.accessToken) {
+            const secureFlag = window.location.protocol === 'https:' ? 'Secure;' : '';
+            document.cookie = `${COOKIE_NAMES.accessToken}=${encodeURIComponent(
+                tokens.accessToken
+            )};Path=/;${secureFlag}SameSite=Lax;Max-Age=${COOKIE_CONFIG.maxAge}`;
+        }
+        
+        if (tokens.refreshToken) {
+            const secureFlag = window.location.protocol === 'https:' ? 'Secure;' : '';
+            document.cookie = `${COOKIE_NAMES.refreshToken}=${encodeURIComponent(
+                tokens.refreshToken
+            )};Path=/;${secureFlag}SameSite=Lax;Max-Age=${COOKIE_CONFIG.maxAge}`;
+        }
+    } else if (cookies) {
+        // Server-side storage using SvelteKit cookies
+        if (tokens.accessToken) {
+            cookies.set(COOKIE_NAMES.accessToken, tokens.accessToken, COOKIE_CONFIG);
+        }
+        
+        if (tokens.refreshToken) {
+            cookies.set(COOKIE_NAMES.refreshToken, tokens.refreshToken, COOKIE_CONFIG);
+        }
     }
 };
 
-// Helper function to clear tokens using SecureTokenStorage
-export const clearTokens = () => {
-    SecureTokenStorage.clearAllTokens();
+// Helper function to clear tokens using cookies
+export const clearTokens = (cookies?: Cookies) => {
+    if (browser && !cookies) {
+        // Client-side
+        document.cookie = `${COOKIE_NAMES.accessToken}=;Path=/;Max-Age=0`;
+        document.cookie = `${COOKIE_NAMES.refreshToken}=;Path=/;Max-Age=0`;
+    } else if (cookies) {
+        // Server-side
+        cookies.delete(COOKIE_NAMES.accessToken, { path: '/' });
+        cookies.delete(COOKIE_NAMES.refreshToken, { path: '/' });
+    }
 };
 
-// Helper function to get tokens using SecureTokenStorage
-export const getTokens = () => {
-    return {
-        accessToken: SecureTokenStorage.getToken('accessToken'),
-        refreshToken: SecureTokenStorage.getToken('refreshToken')
-    };
+// Helper function to get tokens from cookies
+export const getTokens = (cookies?: Cookies) => {
+    if (browser && !cookies) {
+        // Client-side
+        const getCookieValue = (name: string) => {
+            const value = document.cookie
+                .split('; ')
+                .find(row => row.startsWith(`${name}=`))
+                ?.split('=')[1];
+            return value ? decodeURIComponent(value) : null;
+        };
+        
+        return {
+            accessToken: getCookieValue(COOKIE_NAMES.accessToken),
+            refreshToken: getCookieValue(COOKIE_NAMES.refreshToken)
+        };
+    } else if (cookies) {
+        // Server-side
+        return {
+            accessToken: cookies.get(COOKIE_NAMES.accessToken) || null,
+            refreshToken: cookies.get(COOKIE_NAMES.refreshToken) || null
+        };
+    }
+    
+    return { accessToken: null, refreshToken: null };
 };

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import { PUBLIC_AUTH_API_URL } from '$env/static/public';
 import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { AuthApi } from '$lib/auth/api';
-import { SecureTokenStorage } from './lib/auth/secureTokenStorage';
-import { PUBLIC_AUTH_API_URL } from '$env/static/public';
+import { getTokens } from '$lib/auth/store';
 
 const API_URL = PUBLIC_AUTH_API_URL || '';
 
@@ -13,14 +13,16 @@ const API_URL = PUBLIC_AUTH_API_URL || '';
  */
 const authHook: Handle = async ({ event, resolve }) => {
 	// Get access token from cookies or headers
-	const accessToken =
-		SecureTokenStorage.getToken('accessToken') ||
-		event.request.headers.get('Authorization')?.replace('Bearer ', '');
+	// Get access token from cookies or headers
+    const { accessToken } = getTokens(event.cookies);
+    const headerToken = event.request.headers.get('Authorization')?.replace('Bearer ', '');
+    
+    const token = accessToken || headerToken;
 
-	if (accessToken) {
+	if (token) {
 		try {
 			// Validate token with auth server
-			const response = await AuthApi.validateToken(accessToken);
+			const response = await AuthApi.validateToken(token);
 
 			if (response.success && response.data?.valid) {
 				// Set user data in locals for server routes
