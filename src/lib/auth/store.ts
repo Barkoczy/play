@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store';
 import type { UserProfile } from './types';
-import { browser } from '$app/environment';
+import { SecureTokenStorage } from './secureTokenStorage';
 
 // Define initial state
 type AuthState = {
@@ -71,36 +71,25 @@ export const isAuthenticated = derived(authStore, ($authStore) => $authStore.isA
 export const isLoading = derived(authStore, ($authStore) => $authStore.isLoading);
 export const authError = derived(authStore, ($authStore) => $authStore.error);
 
-// Helper function to persist tokens in localStorage if needed
+// Helper function to persist tokens using SecureTokenStorage
 export const storeTokens = (tokens: { accessToken: string; refreshToken?: string }) => {
-	if (browser) {
-		if (tokens.accessToken) {
-			localStorage.setItem('accessToken', tokens.accessToken);
-		}
-		if (tokens.refreshToken) {
-			localStorage.setItem('refreshToken', tokens.refreshToken);
-		}
-	}
+    if (tokens.accessToken) {
+        SecureTokenStorage.setToken('accessToken', tokens.accessToken);
+    }
+    if (tokens.refreshToken) {
+        SecureTokenStorage.setToken('refreshToken', tokens.refreshToken);
+    }
 };
 
-// Helper function to clear tokens from localStorage
+// Helper function to clear tokens using SecureTokenStorage
 export const clearTokens = () => {
-	if (browser) {
-		localStorage.removeItem('accessToken');
-		localStorage.removeItem('refreshToken');
-	}
+    SecureTokenStorage.clearAllTokens();
 };
 
-// Helper function to get tokens from localStorage
+// Helper function to get tokens using SecureTokenStorage
 export const getTokens = () => {
-	if (browser) {
-		return {
-			accessToken: localStorage.getItem('accessToken'),
-			refreshToken: localStorage.getItem('refreshToken')
-		};
-	}
-	return {
-		accessToken: null,
-		refreshToken: null
-	};
+    return {
+        accessToken: SecureTokenStorage.getToken('accessToken'),
+        refreshToken: SecureTokenStorage.getToken('refreshToken')
+    };
 };

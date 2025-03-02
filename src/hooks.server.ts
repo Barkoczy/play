@@ -2,6 +2,7 @@
 import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { AuthApi } from '$lib/auth/api';
+import { SecureTokenStorage } from './lib/auth/secureTokenStorage';
 import { PUBLIC_AUTH_API_URL } from '$env/static/public';
 
 const API_URL = PUBLIC_AUTH_API_URL || '';
@@ -13,7 +14,7 @@ const API_URL = PUBLIC_AUTH_API_URL || '';
 const authHook: Handle = async ({ event, resolve }) => {
 	// Get access token from cookies or headers
 	const accessToken =
-		event.cookies.get('auth_token') ||
+		SecureTokenStorage.getToken('accessToken') ||
 		event.request.headers.get('Authorization')?.replace('Bearer ', '');
 
 	if (accessToken) {

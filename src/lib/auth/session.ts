@@ -1,6 +1,6 @@
-import { AuthApi } from './api';
-import { authStore, getTokens, storeTokens, clearTokens } from './store';
 import { browser } from '$app/environment';
+import { authStore, getTokens, storeTokens, clearTokens } from './store';
+import { AuthApi } from './api';
 import type { UserProfile, LoginCredentials, RegisterCredentials, UpdateProfileData } from './types';
 
 /**
