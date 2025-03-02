@@ -54,11 +54,15 @@ const securityHook: Handle = async ({ event, resolve }) => {
     response.headers.set('X-Frame-Options', 'DENY');
     response.headers.set('X-Content-Type-Options', 'nosniff');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // Array of allowed URLs
+    const allowedUrls = [API_URL, 'https://stream.homelab.quickbiteschronicles.com'];
+    
     // Permissive Content-Security-Policy for development
     // In production, this should be more restrictive
     response.headers.set(
         'Content-Security-Policy',
-        `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ${API_URL}`
+        `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ${allowedUrls.join(' ')}`
     );
     return response;
 };
