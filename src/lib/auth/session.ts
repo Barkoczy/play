@@ -1,12 +1,7 @@
-import { browser } from '$app/environment';
 import { authStore, getTokens, storeTokens, clearTokens } from './store';
 import { AuthApi } from './api';
 import type { UserProfile, LoginCredentials, RegisterCredentials, UpdateProfileData } from './types';
 
-/**
- * Initialize the auth session
- * Checks for existing tokens and tries to fetch the user profile
- */
 /**
  * Authentication service to handle all auth-related operations
  */
@@ -37,7 +32,6 @@ export const AuthService = {
         throw new Error(response.error || 'Login failed');
       }
     } catch (error) {
-      console.error('Login error:', error);
       authStore.setError(error instanceof Error ? error.message : 'Login failed');
       return null;
     } finally {
@@ -71,7 +65,6 @@ export const AuthService = {
         throw new Error(response.error || 'Registration failed');
       }
     } catch (error) {
-      console.error('Registration error:', error);
       authStore.setError(error instanceof Error ? error.message : 'Registration failed');
       return null;
     } finally {
@@ -215,15 +208,17 @@ export const AuthService = {
  * Checks for existing tokens and tries to fetch the user profile
  */
 export async function initAuthSession(): Promise<void> {
-  if (!browser) return;
-  
+  if (typeof window === 'undefined') {
+    return;
+  }
+
   // Set loading state
   authStore.setLoading(true);
   
   try {
     // Check for existing tokens
     const { accessToken, refreshToken } = getTokens();
-    
+
     if (!accessToken) {
       authStore.clearUser();
       return;
@@ -264,7 +259,6 @@ export async function initAuthSession(): Promise<void> {
       clearTokens();
     }
   } catch (error) {
-    console.error('Auth initialization error:', error);
     authStore.setError(error instanceof Error ? error.message : 'Authentication failed');
     clearTokens();
   } finally {

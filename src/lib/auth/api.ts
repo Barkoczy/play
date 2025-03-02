@@ -174,25 +174,36 @@ export const AuthApi = {
 	/**
 	 * Check if a token is valid
 	 */
-	async validateToken(token: string): Promise<
-		ApiResponse<{
-			valid: boolean;
+	async validateToken(token: string): Promise<{
+		success: boolean;
+		valid?: boolean;
+		data?: {
 			userId?: string;
 			email?: string;
-			name?: string;
-			verified?: boolean;
-		}>
-	> {
-		const response = await fetch(
-			`${API_URL}/auth/validate`,
-			getAuthOptions('GET', undefined, token)
-		);
-		return handleResponse<{
-			valid: boolean;
-			userId?: string;
-			email?: string;
-			name?: string;
-			verified?: boolean;
-		}>(response);
+			fullName?: string;
+			isVerified?: boolean;
+		};
+		error?: string;
+	}> {
+		try {
+			const response = await fetch(
+				`${API_URL}/auth/validate`,
+				getAuthOptions('GET', undefined, token)
+			);
+
+			// Server vracia: { success: true, valid: true, data: { ... } }
+			const result = await response.json();
+			console.log('Raw API response:', result);
+
+			// Vráť objekt v rovnakom formáte, ako ho vracia server
+			return result;
+		} catch (error) {
+			console.error('validateToken error:', error);
+			return {
+				success: false,
+				valid: false,
+				error: error instanceof Error ? error.message : 'Token validation failed'
+			};
+		}
 	}
 };

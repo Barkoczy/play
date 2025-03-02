@@ -1,3 +1,4 @@
-import { protectedLoad } from '$lib/auth';
+import type { PageLoad } from './$types';
+import { protectedLoad } from '$lib/auth/guards';
 
-export const load = protectedLoad;
+export const load: PageLoad = protectedLoad;

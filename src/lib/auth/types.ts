@@ -1,10 +1,10 @@
 export interface UserProfile {
-	id: string;
+	userId: string;
 	email: string;
 	fullName: string;
 	avatarUrl?: string | null;
 	isVerified: boolean;
-	providers: Array<'google' | 'discord' | 'github'>;
+	providers?: Array<'google' | 'discord' | 'github'>;
 }
 
 export interface LoginCredentials {
@@ -53,3 +53,15 @@ export type CustomPageLoad = {
 	parent: () => Promise<Record<string, unknown>>;
 	url?: URL;
 };
+
+export interface TokenValidationResponse {
+    success: boolean;
+    valid: boolean;
+    data?: {
+        userId: string;
+        email: string;
+        fullName: string;
+        isVerified: boolean;
+    };
+    error?: string;
+}

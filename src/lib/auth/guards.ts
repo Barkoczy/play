@@ -1,7 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import { isAuthenticated, isLoading } from './store';
-import { initAuthSession } from './session';
 import type { CustomPageLoad } from './types';
 
 /**
@@ -16,7 +15,7 @@ export function protectedGuard({ url }: { url: URL }) {
   if ($isLoading) {
     return;
   }
-
+  
   // If not authenticated, redirect to login
   if (!$isAuthenticated) {
     const from = url.pathname + url.search;
@@ -31,12 +30,12 @@ export function protectedGuard({ url }: { url: URL }) {
 export function publicOnlyGuard() {
   const $isAuthenticated = get(isAuthenticated);
   const $isLoading = get(isLoading);
-
+  
   // If still loading, don't redirect yet
   if ($isLoading) {
     return;
   }
-
+  
   // If authenticated, redirect to home page
   if ($isAuthenticated) {
     throw redirect(307, '/');
@@ -45,18 +44,16 @@ export function publicOnlyGuard() {
 
 /**
  * Load function for pages that need authentication
- * Will initialize auth session if not already initialized
+ * Now just uses the store state that was initialized on the server
  */
 export const protectedLoad = async ({ parent, url }: CustomPageLoad) => {
   if (!url) {
     throw new Error('URL is undefined');
   }
-  // Initialize auth session if needed
-  await initAuthSession();
-
+  
   // Apply the protected guard
   protectedGuard({ url });
-
+  
   // Return data from parent load function if any
   const data = await parent();
   return data;
@@ -66,12 +63,9 @@ export const protectedLoad = async ({ parent, url }: CustomPageLoad) => {
  * Load function for pages that should only be accessible when not authenticated
  */
 export const publicOnlyLoad = async ({ parent }: CustomPageLoad) => {
-  // Initialize auth session if needed
-  await initAuthSession();
-
   // Apply the public only guard
   publicOnlyGuard();
-
+  
   // Return data from parent load function if any
   const data = await parent();
   return data;
