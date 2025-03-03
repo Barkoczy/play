@@ -190,12 +190,7 @@ export const AuthApi = {
 				`${API_URL}/auth/validate`,
 				getAuthOptions('GET', undefined, token)
 			);
-
-			// Server vracia: { success: true, valid: true, data: { ... } }
 			const result = await response.json();
-			console.log('Raw API response:', result);
-
-			// Vráť objekt v rovnakom formáte, ako ho vracia server
 			return result;
 		} catch (error) {
 			console.error('validateToken error:', error);

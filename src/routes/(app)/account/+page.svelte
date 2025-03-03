@@ -138,7 +138,7 @@
 							<div class="flex-grow">
 								<p class="font-medium text-gray-900">Google</p>
 							</div>
-							{#if $user.providers.includes('google')}
+							{#if $user.providers?.includes('google')}
 								<button
 									type="button"
 									class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
@@ -166,7 +166,7 @@
 							<div class="flex-grow">
 								<p class="font-medium text-gray-900">GitHub</p>
 							</div>
-							{#if $user.providers.includes('github')}
+							{#if $user.providers?.includes('github')}
 								<button
 									type="button"
 									class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
@@ -194,7 +194,7 @@
 							<div class="flex-grow">
 								<p class="font-medium text-gray-900">Discord</p>
 							</div>
-							{#if $user.providers.includes('discord')}
+							{#if $user.providers?.includes('discord')}
 								<button
 									type="button"
 									class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"

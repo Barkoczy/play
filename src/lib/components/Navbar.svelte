@@ -50,13 +50,13 @@
 
 <svelte:window on:click={handleClickOutside} />
 
-<nav class="bg-white shadow">
+<nav class="bg-white relative z-40 shadow">
 	<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 		<div class="flex h-16 justify-between">
 			<div class="flex">
 				<!-- Logo -->
 				<div class="flex flex-shrink-0 items-center">
-					<a href="/" class="text-xl font-bold text-blue-600">YourApp</a>
+					<a href="/" class="text-xl font-bold text-blue-600">Play</a>
 				</div>
 
 				<!-- Desktop navigation -->
@@ -119,7 +119,7 @@
 							<div
 								id="profile-dropdown"
 								transition:slide={{ duration: 200 }}
-								class="ring-opacity-5 absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black focus:outline-none"
+								class="ring-opacity-5 absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-white focus:outline-none z-50"
 							>
 								<a href="/account" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
 									Your Profile

@@ -2,11 +2,6 @@ import type { LayoutServerLoad } from './$types';
 import { authStore } from '$lib/auth/store';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-  console.log('layout.server.ts load function called with locals:', {
-    isAuthenticated: locals.isAuthenticated,
-    hasUser: !!locals.user
-  });
-  
   // Najprv explicitne resetujeme loading stav
   authStore.setLoading(false);
   
