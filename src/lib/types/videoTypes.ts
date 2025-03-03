@@ -10,6 +10,9 @@ export interface Video {
     live: boolean;
     videoUrl: string;
     desc: string;
+    thumbnail: string;
     channel: Channel;
     category: string;
+    uploadDate: string;
+    duration: string;
 }

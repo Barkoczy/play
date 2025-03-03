@@ -3,14 +3,17 @@
         "videoId": "dQw4w9WgXcQ",
         "name": "Nová filmová premiéra - Zaklínač: Sirény z hlubin 2025",
         "live": true,
+        "category": "movie",
         "videoUrl": "https://stream.homelab.quickbiteschronicles.com/hls/test.m3u8",
+        "thubmnail": "https://image.tmdb.org/t/p/original/1YL8ksfwm3p2Tgt1yaNVYYOvOKC.jpg",
         "desc": "Po přepadení lodi tajemnými stvořeními z hlubin se schyluje k válce mezi pevninou a mořem, kterou může zastavit jediný člověk: zaklínač Geralt z Rivie.",
+        "uploadDate": "2024-03-04T14:30:00Z",
+        "duration": "PT2H15M",
         "channel": {
             "name": "FilmFanatic",
             "desc": "Najnovšie filmové premiéry a recenzie",
             "subscribers": 876000
-        },
-        "category": "movie"
+        }
     },
     {
         "videoId": "jNQXAC9IVRw",

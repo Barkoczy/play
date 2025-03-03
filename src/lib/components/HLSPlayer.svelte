@@ -494,7 +494,7 @@
 			class="player-controls absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent px-4 pt-12 pb-4"
 		>
 			<!-- Progress bar -->
-			<div class="relative mb-4 h-1 w-full cursor-pointer rounded-full bg-gray-700">
+			<div class="relative mb-4 h-1 w-full cursor-pointer rounded-full bg-gray-700 overflow-hidden">
 				<div
 					class="absolute top-0 left-0 h-full rounded-full bg-red-600"
 					style="width: {progress}%"
