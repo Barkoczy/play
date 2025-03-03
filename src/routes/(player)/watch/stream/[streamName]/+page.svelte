@@ -404,227 +404,220 @@
 	<title>Live Stream - {streamName || 'Not Found'}</title>
 </svelte:head>
 
-<div class="mx-auto max-w-6xl pt-4">
+<div class="w-full max-w-none bg-black">
 	{#if !streamName}
-		<div class="rounded-lg border border-red-800 bg-red-900/30 p-6">
-			<h2 class="mb-2 text-xl font-semibold text-red-400">Stream nenájdený</h2>
-			<p class="text-gray-300">Prosím, zadajte platný názov streamu.</p>
+		<div class="mx-auto max-w-6xl p-4">
+			<div class="rounded-lg border border-red-800 bg-red-900/30 p-6">
+				<h2 class="mb-2 text-xl font-semibold text-red-400">Stream nenájdený</h2>
+				<p class="text-gray-300">Prosím, zadajte platný názov streamu.</p>
+			</div>
 		</div>
 	{:else}
-		<div class="overflow-hidden rounded-lg bg-gray-900 shadow-xl">
-			<h1 class="border-b border-gray-800 p-4 text-xl font-bold">
-				{streamName}
-				<span class="ml-2 rounded-full bg-red-600 px-2 py-0.5 text-xs">LIVE</span>
-			</h1>
-
-			<div
-				class="video-container relative bg-black"
-				style="height: {containerHeight}px"
-				bind:this={videoContainer}
-				bind:clientWidth={containerWidth}
-			>
-				<!-- Video Player -->
-				<!-- svelte-ignore a11y_media_has_caption -->
-				<video
-					bind:this={videoRef}
-					class="h-full w-full cursor-pointer"
-					playsinline
-					on:click={togglePlay}
-					class:opacity-0={isLoading || hasError}
-				></video>
-
-				<!-- Loading Indicator -->
-				{#if isLoading}
-					<div class="absolute inset-0 flex flex-col items-center justify-center bg-black/70">
-						<div
-							class="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-red-500 border-t-transparent"
-						></div>
-						<p class="text-gray-200">Načítavanie streamu...</p>
-					</div>
-				{/if}
-
-				<!-- Buffering Indicator -->
-				{#if isBuffering && !isLoading}
-					<div
-						class="absolute bottom-20 right-4 flex items-center gap-1.5 rounded-lg bg-black/80 px-3 py-1.5 text-sm"
-					>
-						<div
-							class="h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-t-red-500"
-						></div>
-						<span>Buffering...</span>
-					</div>
-				{/if}
-
-				<!-- Error Message -->
-				{#if hasError}
-					<div
-						class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 p-6 text-center"
-					>
-						<AlertTriangle size={48} class="mb-4 text-red-500" />
-						<h3 class="mb-2 text-xl font-bold text-white">Chyba pri načítaní streamu</h3>
-						<p class="mb-6 text-gray-300">{errorMessage}</p>
-						<button
-							on:click={refreshStream}
-							class="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 hover:bg-red-700"
-						>
-							<RefreshCw size={16} />
-							Skúsiť znova
-						</button>
-					</div>
-				{/if}
-
-				<!-- Player Controls -->
+		<!-- YouTube-like container with 16:9 aspect ratio -->
+		<div class="mx-auto w-full max-w-none">
+			<!-- Video container with 16:9 aspect ratio -->
+			<div class="relative w-full pb-[56.25%]">
 				<div
-					class="player-controls absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-12"
+					class="video-container absolute inset-0 bg-black"
+					bind:this={videoContainer}
+					bind:clientWidth={containerWidth}
 				>
-					<!-- Progress bar -->
-					<div class="relative mb-4 h-1 w-full cursor-pointer rounded-full bg-gray-700">
-						<div
-							class="absolute left-0 top-0 h-full rounded-full bg-red-600"
-							style="width: {progress}%"
-						></div>
-						<div
-							class="absolute left-0 top-0 h-full rounded-full bg-gray-600/50"
-							style="width: {(bufferEnd / (duration || 1)) * 100}%"
-						></div>
-					</div>
+					<!-- Video Player (unchanged) -->
+					<!-- svelte-ignore a11y_media_has_caption -->
+					<video
+						bind:this={videoRef}
+						class="h-full w-full cursor-pointer"
+						playsinline
+						on:click={togglePlay}
+						class:opacity-0={isLoading || hasError}
+					></video>
 
-					<div class="flex items-center gap-4">
-						<!-- Play/Pause button -->
-						<button
-							class="text-white transition-colors hover:text-red-500"
-							on:click={togglePlay}
-							aria-label={isPlaying ? 'Pozastaviť' : 'Prehrať'}
+					<!-- Loading Indicator (unchanged) -->
+					{#if isLoading}
+						<div class="absolute inset-0 flex flex-col items-center justify-center bg-black/70">
+							<div
+								class="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-red-500 border-t-transparent"
+							></div>
+							<p class="text-gray-200">Načítavanie streamu...</p>
+						</div>
+					{/if}
+
+					<!-- Buffering Indicator (unchanged) -->
+					{#if isBuffering && !isLoading}
+						<div
+							class="absolute bottom-20 right-4 flex items-center gap-1.5 rounded-lg bg-black/80 px-3 py-1.5 text-sm"
 						>
-							{#if isPlaying}
-								<Pause size={24} />
-							{:else}
-								<Play size={24} />
-							{/if}
-						</button>
+							<div
+								class="h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-t-red-500"
+							></div>
+							<span>Buffering...</span>
+						</div>
+					{/if}
 
-						<!-- Volume control -->
-						<div class="flex items-center gap-2">
+					<!-- Error Message (unchanged) -->
+					{#if hasError}
+						<div
+							class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 p-6 text-center"
+						>
+							<AlertTriangle size={48} class="mb-4 text-red-500" />
+							<h3 class="mb-2 text-xl font-bold text-white">Chyba pri načítaní streamu</h3>
+							<p class="mb-6 text-gray-300">{errorMessage}</p>
+							<button
+								on:click={refreshStream}
+								class="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 hover:bg-red-700"
+							>
+								<RefreshCw size={16} />
+								Skúsiť znova
+							</button>
+						</div>
+					{/if}
+
+					<!-- Player Controls (unchanged) -->
+					<div
+						class="player-controls absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-12"
+					>
+						<!-- Progress bar -->
+						<div class="relative mb-4 h-1 w-full cursor-pointer rounded-full bg-gray-700">
+							<div
+								class="absolute left-0 top-0 h-full rounded-full bg-red-600"
+								style="width: {progress}%"
+							></div>
+							<div
+								class="absolute left-0 top-0 h-full rounded-full bg-gray-600/50"
+								style="width: {(bufferEnd / (duration || 1)) * 100}%"
+							></div>
+						</div>
+
+						<div class="flex items-center gap-4">
+							<!-- Play/Pause button -->
 							<button
 								class="text-white transition-colors hover:text-red-500"
-								on:click={toggleMute}
-								aria-label={isMuted ? 'Zapnúť zvuk' : 'Stlmiť'}
+								on:click={togglePlay}
+								aria-label={isPlaying ? 'Pozastaviť' : 'Prehrať'}
 							>
-								{#if isMuted || volume === 0}
-									<VolumeX size={20} />
+								{#if isPlaying}
+									<Pause size={24} />
 								{:else}
-									<Volume2 size={20} />
+									<Play size={24} />
 								{/if}
 							</button>
 
-							<input
-								type="range"
-								min="0"
-								max="1"
-								step="0.01"
-								class="slider w-20 md:w-32"
-								value={volume}
-								on:input={handleVolumeChange}
-								disabled={isMuted}
-							/>
-						</div>
-
-						<!-- Time display -->
-						<div class="ml-auto hidden text-sm text-gray-300 sm:block">
-							<span>{formatTime(currentTime)}</span>
-							<span class="mx-1">/</span>
-							<span>LIVE</span>
-						</div>
-
-						<!-- Quality selector (if multiple qualities available) -->
-						{#if qualityLevels.length > 0}
-							<div class="relative hidden sm:block">
-								<select
-									class="rounded bg-gray-800 px-2 py-1 text-sm"
-									value={currentQuality}
-									on:change={(e) => {
-										const target = e.target as HTMLSelectElement | null;
-										if (target) {
-											setQualityLevel(target.value);
-										}
-									}}
+							<!-- Volume control -->
+							<div class="flex items-center gap-2">
+								<button
+									class="text-white transition-colors hover:text-red-500"
+									on:click={toggleMute}
+									aria-label={isMuted ? 'Zapnúť zvuk' : 'Stlmiť'}
 								>
-									<option value="auto">Auto</option>
-									{#each qualityLevels as level}
-										<option value={level.id}>{level.height}p</option>
-									{/each}
-								</select>
+									{#if isMuted || volume === 0}
+										<VolumeX size={20} />
+									{:else}
+										<Volume2 size={20} />
+									{/if}
+								</button>
+
+								<input
+									type="range"
+									min="0"
+									max="1"
+									step="0.01"
+									class="slider w-20 md:w-32"
+									value={volume}
+									on:input={handleVolumeChange}
+									disabled={isMuted}
+								/>
 							</div>
-						{/if}
 
-						<!-- Refresh button -->
-						<button
-							class="text-white transition-colors hover:text-red-500"
-							on:click={refreshStream}
-							aria-label="Obnoviť stream"
-						>
-							<RefreshCw size={20} />
-						</button>
+							<!-- Time display -->
+							<div class="ml-auto hidden text-sm text-gray-300 sm:block">
+								<span>{formatTime(currentTime)}</span>
+								<span class="mx-1">/</span>
+								<span>LIVE</span>
+							</div>
 
-						<!-- Fullscreen button -->
-						<button
-							class="text-white transition-colors hover:text-red-500"
-							on:click={toggleFullscreen}
-							aria-label={isFullscreen ? 'Ukončiť celú obrazovku' : 'Celá obrazovka'}
-						>
-							{#if isFullscreen}
-								<Minimize size={20} />
-							{:else}
-								<Maximize size={20} />
+							<!-- Quality selector (if multiple qualities available) -->
+							{#if qualityLevels.length > 0}
+								<div class="relative hidden sm:block">
+									<select
+										class="rounded bg-gray-800 px-2 py-1 text-sm"
+										value={currentQuality}
+										on:change={(e) => {
+											const target = e.target as HTMLSelectElement | null;
+											if (target) {
+												setQualityLevel(target.value);
+											}
+										}}
+									>
+										<option value="auto">Auto</option>
+										{#each qualityLevels as level}
+											<option value={level.id}>{level.height}p</option>
+										{/each}
+									</select>
+								</div>
 							{/if}
-						</button>
+
+							<!-- Refresh button -->
+							<button
+								class="text-white transition-colors hover:text-red-500"
+								on:click={refreshStream}
+								aria-label="Obnoviť stream"
+							>
+								<RefreshCw size={20} />
+							</button>
+
+							<!-- Fullscreen button -->
+							<button
+								class="text-white transition-colors hover:text-red-500"
+								on:click={toggleFullscreen}
+								aria-label={isFullscreen ? 'Ukončiť celú obrazovku' : 'Celá obrazovka'}
+							>
+								{#if isFullscreen}
+									<Minimize size={20} />
+								{:else}
+									<Maximize size={20} />
+								{/if}
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="border-t border-gray-800 p-4">
-				<h2 class="mb-2 text-xl font-bold">{streamName}</h2>
-				<p class="text-gray-400">
-					Low-latency HLS stream powered by NVIDIA NVENC hardware acceleration
-				</p>
-			</div>
-		</div>
+			<!-- Video info section, YouTube-like styling -->
+			<div class="mx-auto max-w-6xl px-4">
+				<div class="mt-4 rounded-lg bg-zinc-900 p-4 shadow-lg">
+					<div class="flex flex-col space-y-4">
+						<!-- Title and status -->
+						<div class="flex items-start justify-between">
+							<div>
+								<h2 class="text-xl font-bold text-white md:text-2xl">{streamName}</h2>
+								<p class="mt-1 text-sm text-gray-400">
+									<span class="inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-xs font-medium text-white">LIVE</span>
+									<span class="ml-2">Low-latency HLS stream powered by NVIDIA NVENC</span>
+								</p>
+							</div>
+						</div>
 
-		<!-- Stream Information -->
-		<div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-			<div class="rounded-lg bg-gray-800/70 p-4">
-				<h3 class="mb-3 text-lg font-semibold">Stream Info</h3>
-				<div class="space-y-2 text-sm">
-					<div class="flex justify-between border-b border-gray-700 pb-2">
-						<span class="text-gray-400">Source</span>
-						<span>RTMP</span>
-					</div>
-					<div class="flex justify-between border-b border-gray-700 pb-2">
-						<span class="text-gray-400">Protocol</span>
-						<span>LL-HLS</span>
-					</div>
-					<div class="flex justify-between border-b border-gray-700 pb-2">
-						<span class="text-gray-400">Encoding</span>
-						<span>NVIDIA NVENC</span>
-					</div>
-					<div class="flex justify-between">
-						<span class="text-gray-400">Latency</span>
-						<span>Ultra Low (~1-3s)</span>
+						<!-- Channel info and buttons, YouTube-like -->
+						<div class="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-zinc-800 pt-4">
+							<div class="flex items-center space-x-3">
+								<div class="h-10 w-10 overflow-hidden rounded-full bg-zinc-700">
+									<!-- Channel avatar placeholder -->
+									<div class="flex h-full w-full items-center justify-center bg-red-600 text-white">
+										<span class="text-lg font-bold">{streamName.charAt(0).toUpperCase()}</span>
+									</div>
+								</div>
+								<div>
+									<h3 class="font-bold text-white">{streamName} Channel</h3>
+									<p class="text-xs text-gray-400">Hardware accelerated streaming</p>
+								</div>
+							</div>
+							
+							<button class="rounded-full bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700">
+								Subscribe
+							</button>
+						</div>
 					</div>
 				</div>
-			</div>
-
-			<div class="rounded-lg bg-gray-800/70 p-4">
-				<h3 class="mb-3 text-lg font-semibold">How to Stream</h3>
-				<p class="mb-3 text-gray-400">
-					Stream to this channel using your favorite streaming software:
-				</p>
-				<div class="mb-3 overflow-x-auto rounded bg-gray-900 p-3 font-mono text-sm">
-					rtmp://localhost:1935/live/{streamName}
-				</div>
-				<p class="text-sm text-gray-400">
-					Set your encoder to use H.264 for maximum compatibility.
-				</p>
 			</div>
 		</div>
 	{/if}
@@ -640,14 +633,20 @@
 		transition: opacity 0.3s ease;
 	}
 
+	/* YouTube-like slider styles */
 	.slider {
 		-webkit-appearance: none;
 		appearance: none;
 		width: 100%;
 		height: 3px;
 		border-radius: 5px;
-		background: #636363;
+		background: #4d4d4d;
 		outline: none;
+		transition: height 0.2s ease;
+	}
+
+	.slider:hover {
+		height: 5px;
 	}
 
 	.slider::-webkit-slider-thumb {
@@ -658,6 +657,11 @@
 		border-radius: 50%;
 		background: #ff0000;
 		cursor: pointer;
+		transition: transform 0.2s ease;
+	}
+
+	.slider:hover::-webkit-slider-thumb {
+		transform: scale(1.2);
 	}
 
 	.slider::-moz-range-thumb {
@@ -667,5 +671,10 @@
 		background: #ff0000;
 		cursor: pointer;
 		border: none;
+		transition: transform 0.2s ease;
+	}
+
+	.slider:hover::-moz-range-thumb {
+		transform: scale(1.2);
 	}
 </style>
