@@ -14,7 +14,7 @@
 	import type { QualityLevel, RecoveryAttempts } from '../types/videoPlayer';
 
 	// Props
-	const { videoUrl = '', autoplay = true } = $props();
+	const { videoUrl = '', autoplay = true, live = false } = $props();
 
 	// Player states
 	let videoRef: HTMLVideoElement;
@@ -36,6 +36,13 @@
 	let qualityLevels: QualityLevel[] = $state([]);
 	let currentQuality = $state('auto');
 	let containerWidth = $state(0);
+	let previousVideoUrl = $state('');
+	let isInitializing = false;
+	
+	// Nové premenné pre vlastný dropdown
+	let displayQuality = $state('Auto');
+	let selectedQualityId = $state('auto');
+	let isQualityMenuOpen = $state(false);
 
 	const formatTime = (seconds: number) => {
 		if (isNaN(seconds) || seconds < 0) return '00:00';
@@ -45,8 +52,9 @@
 	};
 
 	function initPlayer() {
-		if (!videoUrl || !videoRef) return;
+		if (!videoUrl || !videoRef || isInitializing) return;
 
+		isInitializing = true;
 		isLoading = true;
 		hasError = false;
 
@@ -224,6 +232,10 @@
 			errorMessage = 'HLS is not supported in your browser';
 			isLoading = false;
 		}
+
+		setTimeout(() => {
+			isInitializing = false;
+		}, 500);
 	}
 
 	function togglePlay() {
@@ -270,15 +282,34 @@
 		}
 	}
 
+	// Upravená funkcia na nastavenie kvality videa
 	function setQualityLevel(level: string | number) {
 		if (!hlsInstance) return;
-
-		if (level === 'auto') {
+		
+		// Konvertovanie level na string pre konzistentnosť
+		const levelStr = String(level);
+		
+		if (levelStr === 'auto') {
 			hlsInstance.currentLevel = -1; // Auto
+			displayQuality = 'Auto';
+			selectedQualityId = 'auto';
 			currentQuality = 'auto';
 		} else {
-			hlsInstance.currentLevel = parseInt(String(level));
-			currentQuality = String(level);
+			// Konvertovanie na číslo pre HLS.js API
+			const levelNum = parseInt(levelStr);
+			hlsInstance.currentLevel = levelNum;
+			
+			// Nájdi zvolený level a aktualizuj zobrazovanú kvalitu
+			const selectedLevel = qualityLevels.find(q => q.id === levelNum);
+			if (selectedLevel) {
+				displayQuality = `${selectedLevel.height}p`;
+			}
+			
+			// Aktualizácia ID pre select element
+			selectedQualityId = levelStr;
+			currentQuality = levelStr;
+			
+			console.log(`Kvalita nastavená na: ${displayQuality}`);
 		}
 	}
 
@@ -338,6 +369,17 @@
 		isLoading = false;
 	}
 
+	// Funkcia na zatvorenie dropdown menu pri kliknutí mimo
+	function handleClickOutside(event: MouseEvent) {
+		if (isQualityMenuOpen && videoContainer) {
+			const target = event.target as HTMLElement;
+			const qualityDropdown = videoContainer.querySelector('.quality-dropdown');
+			if (qualityDropdown && !qualityDropdown.contains(target)) {
+				isQualityMenuOpen = false;
+			}
+		}
+	}
+
 	function setupEventListeners() {
 		if (!videoRef) return;
 
@@ -348,6 +390,7 @@
 		videoRef.addEventListener('playing', handlePlaying);
 		videoRef.addEventListener('canplay', handleCanPlay);
 		document.addEventListener('fullscreenchange', handleFullscreenChange);
+		document.addEventListener('click', handleClickOutside);
 	}
 
 	function cleanupEventListeners() {
@@ -360,6 +403,7 @@
 		videoRef.removeEventListener('playing', handlePlaying);
 		videoRef.removeEventListener('canplay', handleCanPlay);
 		document.removeEventListener('fullscreenchange', handleFullscreenChange);
+		document.removeEventListener('click', handleClickOutside);
 	}
 
 	onMount(() => {
@@ -381,7 +425,8 @@
 
 	// Watch for videoUrl changes and re-initialize player
 	$effect(() => {
-		if (videoUrl && videoRef) {
+		if (videoUrl && videoRef && videoUrl !== previousVideoUrl) {
+			previousVideoUrl = videoUrl;
 			initPlayer();
 		}
 	});
@@ -503,28 +548,60 @@
 				<!-- Time display -->
 				<div class="ml-auto hidden text-sm text-gray-300 sm:block">
 					<span>{formatTime(currentTime)}</span>
-					<span class="mx-1">/</span>
-					<span>LIVE</span>
+					{#if live}
+						<span class="mx-1">/</span>
+						<span class="inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-xs font-medium text-white">LIVE</span>
+					{/if}
 				</div>
 
-				<!-- Quality selector (if multiple qualities available) -->
+				<!-- Custom Quality selector dropdown -->
 				{#if qualityLevels.length > 0}
-					<div class="relative hidden sm:block">
-						<select
-							class="rounded bg-gray-800 px-2 py-1 text-sm"
-							value={currentQuality}
-							onchange={(e) => {
-								const target = e.target as HTMLSelectElement;
-								if (target) {
-									setQualityLevel(target.value);
-								}
-							}}
+					<div class="relative hidden sm:block quality-dropdown">
+						<button
+							type="button"
+							class="flex items-center rounded bg-gray-800 px-2 py-1 text-sm"
+							onclick={() => isQualityMenuOpen = !isQualityMenuOpen}
 						>
-							<option value="auto">Auto</option>
-							{#each qualityLevels as level}
-								<option value={level.id}>{level.height}p</option>
-							{/each}
-						</select>
+							<span>{displayQuality}</span>
+							<svg
+								class="ml-1 h-4 w-4 transform transition-transform"
+								class:rotate-180={isQualityMenuOpen}
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+							</svg>
+						</button>
+						
+						{#if isQualityMenuOpen}
+							<div class="absolute right-0 top-full z-50 mt-1 w-24 overflow-hidden rounded bg-gray-800 shadow-lg">
+								<button
+									class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-700"
+									class:bg-gray-700={selectedQualityId === 'auto'}
+									onclick={() => {
+										setQualityLevel('auto');
+										isQualityMenuOpen = false;
+									}}
+								>
+									Auto
+								</button>
+								
+								{#each qualityLevels as level}
+									<button
+										class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-700"
+										class:bg-gray-700={selectedQualityId === String(level.id)}
+										onclick={() => {
+											setQualityLevel(level.id);
+											isQualityMenuOpen = false;
+										}}
+									>
+										{level.height}p
+									</button>
+								{/each}
+							</div>
+						{/if}
 					</div>
 				{/if}
 

@@ -13,3 +13,9 @@ export interface PlayerError {
 export interface RecoveryAttempts {
     [key: string]: number;
 }
+
+export interface PlayerProps {
+    videoUrl: string;
+    autoplay?: boolean;
+    live?: boolean;
+}

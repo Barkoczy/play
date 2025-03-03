@@ -532,7 +532,7 @@
 							<div class="ml-auto hidden text-sm text-gray-300 sm:block">
 								<span>{formatTime(currentTime)}</span>
 								<span class="mx-1">/</span>
-								<span>LIVE</span>
+								<span class="inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-xs font-medium text-white">LIVE</span>
 							</div>
 
 							<!-- Quality selector (if multiple qualities available) -->
