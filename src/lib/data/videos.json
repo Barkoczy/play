@@ -1,0 +1,158 @@
+[
+    {
+        "videoId": "dQw4w9WgXcQ",
+        "name": "Nová filmová premiéra - Zaklínač: Sirény z hlubin 2025",
+        "live": true,
+        "videoUrl": "https://stream.homelab.quickbiteschronicles.com/hls/test.m3u8",
+        "desc": "Po přepadení lodi tajemnými stvořeními z hlubin se schyluje k válce mezi pevninou a mořem, kterou může zastavit jediný člověk: zaklínač Geralt z Rivie.",
+        "channel": {
+            "name": "FilmFanatic",
+            "desc": "Najnovšie filmové premiéry a recenzie",
+            "subscribers": 876000
+        },
+        "category": "movie"
+    },
+    {
+        "videoId": "jNQXAC9IVRw",
+        "name": "Víkendový maratón - Temná sága",
+        "live": true,
+        "videoUrl": "https://example.com/streams/jNQXAC9IVRw.m3u8",
+        "desc": "Nepretržitý stream najlepších epizód populárneho seriálu Temná sága",
+        "channel": {
+            "name": "SeriesBox",
+            "desc": "Všetko o seriáloch na jednom mieste",
+            "subscribers": 1230000
+        },
+        "category": "series"
+    },
+    {
+        "videoId": "bL_NcoCJgzo",
+        "name": "Klasické filmy 20. storočia",
+        "live": false,
+        "videoUrl": "https://example.com/streams/bL_NcoCJgzo.m3u8",
+        "desc": "Kolekcia najznámejších filmových klasík všetkých čias v digitálne reštaurovanej kvalite",
+        "channel": {
+            "name": "FilmFanatic",
+            "desc": "Najnovšie filmové premiéry a recenzie",
+            "subscribers": 876000
+        },
+        "category": "movie"
+    },
+    {
+        "videoId": "o6Y7aCT9kis",
+        "name": "Hviezdy nad nami - Nová epizóda",
+        "live": false,
+        "videoUrl": "https://example.com/streams/o6Y7aCT9kis.m3u8",
+        "desc": "Premiéra najnovšej epizódy sci-fi seriálu Hviezdy nad nami",
+        "channel": {
+            "name": "SeriesBox",
+            "desc": "Všetko o seriáloch na jednom mieste",
+            "subscribers": 1230000
+        },
+        "category": "series"
+    },
+    {
+        "videoId": "xWcldHxHFpo",
+        "name": "Večerný pokec s celebritami",
+        "live": true,
+        "videoUrl": "https://example.com/streams/xWcldHxHFpo.m3u8",
+        "desc": "Živá talk show s hosťami zo sveta filmu, hudby a športu",
+        "channel": {
+            "name": "ChatMaster",
+            "desc": "Najlepšie rozhovory a zábavné show",
+            "subscribers": 945000
+        },
+        "category": "chat"
+    },
+    {
+        "videoId": "2Z4m4lnjxkY",
+        "name": "Recenzia: Nový akčný triler Temný horizont",
+        "live": false,
+        "videoUrl": "https://example.com/streams/2Z4m4lnjxkY.m3u8",
+        "desc": "Podrobná recenzia a analýza nového kasového trháku",
+        "channel": {
+            "name": "MovieCritic",
+            "desc": "Nezávislé filmové recenzie a analýzy",
+            "subscribers": 567000
+        },
+        "category": "movie"
+    },
+    {
+        "videoId": "9bZkp7q19f0",
+        "name": "Gaming Stream #1",
+        "live": true,
+        "videoUrl": "https://example.com/streams/9bZkp7q19f0.m3u8",
+        "desc": "Live gaming stream with the newest games and commentary",
+        "channel": {
+            "name": "GamerPro",
+            "desc": "Premium gaming content",
+            "subscribers": 125000
+        },
+        "category": "gaming"
+    },
+    {
+        "videoId": "kJQP7kiw5Fk",
+        "name": "Tech Talk 2023",
+        "live": true,
+        "videoUrl": "https://example.com/streams/kJQP7kiw5Fk.m3u8",
+        "desc": "Live coverage of the biggest tech conference of the year",
+        "channel": {
+            "name": "TechInsider",
+            "desc": "Latest tech news and reviews",
+            "subscribers": 430000
+        },
+        "category": "tech"
+    },
+    {
+        "videoId": "OPf0YbXqDm0",
+        "name": "Live Music Session",
+        "live": true,
+        "videoUrl": "https://example.com/streams/OPf0YbXqDm0.m3u8",
+        "desc": "Live music performance with guest artists",
+        "channel": {
+            "name": "MusicStation",
+            "desc": "24/7 music content",
+            "subscribers": 750000
+        },
+        "category": "music"
+    },
+    {
+        "videoId": "pRpeEdMmmQ0",
+        "name": "24/7 News Coverage",
+        "live": true,
+        "videoUrl": "https://example.com/streams/pRpeEdMmmQ0.m3u8",
+        "desc": "Breaking news and current events from around the world",
+        "channel": {
+            "name": "GlobalNews",
+            "desc": "International news coverage",
+            "subscribers": 2100000
+        },
+        "category": "news"
+    },
+    {
+        "videoId": "fJ9rUzIMcZQ",
+        "name": "Svelte 5 Rune Model Tutorial",
+        "live": false,
+        "videoUrl": "https://example.com/streams/fJ9rUzIMcZQ.m3u8",
+        "desc": "Learn how to use the new Svelte 5 rune model effectively",
+        "channel": {
+            "name": "CodeMaster",
+            "desc": "Programming tutorials and tips",
+            "subscribers": 325000
+        },
+        "category": "tech"
+    },
+    {
+        "videoId": "y6120QOlsfU",
+        "name": "Amazing Nature Documentary",
+        "live": false,
+        "videoUrl": "https://example.com/streams/y6120QOlsfU.m3u8",
+        "desc": "Explore the wonders of nature in this fascinating documentary",
+        "channel": {
+            "name": "NatureExplorer",
+            "desc": "Nature documentaries and animal facts",
+            "subscribers": 1500000
+        },
+        "category": "documentary"
+    }
+]
