@@ -1,28 +1,52 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import type { Handle } from '@sveltejs/kit';
+import { sequence } from '@sveltejs/kit/hooks';
 import { allowedUrls, securityConfig } from '$lib/conf/securityConfig';
+import { AuthApi } from '$lib/auth/api';
+import { getTokens } from '$lib/auth/store';
+
+/**
+ * Auth hook to handle server-side authentication
+ * Validates tokens and sets user data in locals for server routes
+ */
+const authHook: Handle = async ({ event, resolve }) => {
+	// Get access token from cookies or headers
+	const { accessToken } = getTokens(event.cookies);
+	const headerToken = event.request.headers.get('Authorization')?.replace('Bearer ', '');
+	const token = accessToken || headerToken;
+
+	if (token) {
+		try {
+			// Validate token with auth server
+			const response = await AuthApi.validateToken(token);
+
+			if (response.success && response.valid && response.data?.userId) {
+				// Set user data in locals for server routes
+				event.locals.user = {
+					userId: response.data.userId!,
+					email: response.data.email!,
+					fullName: response.data.fullName!,
+					isVerified: response.data.isVerified!
+				};
+				event.locals.isAuthenticated = true;
+			}
+		} catch (error) {
+			console.error('Token validation error:', error);
+		}
+	}
+
+	// Set default values if not authenticated
+	if (!event.locals.user) {
+		event.locals.user = null;
+		event.locals.isAuthenticated = false;
+	}
+	return resolve(event);
+};
 
 /**
  * Security headers hook
  */
 const securityHook: Handle = async ({ event, resolve }) => {
-    // SEO optimalizácia - normalizácia URL (odstránenie lomítka na konci)
-    if (event.url.pathname.endsWith('/') && event.url.pathname !== '/') {
-        return new Response(null, {
-            status: 301,
-            headers: {
-                location: event.url.pathname.slice(0, -1) + event.url.search
-            }
-        });
-    }
-    
-    // Predvoľba prerendering pre SEO stránky
-    if (event.url.pathname.startsWith('/watch/')) {
-        event.setHeaders({
-            'Cache-Control': 'public, max-age=60, s-maxage=60'
-        });
-    }
-    
-    // Pokračuj s pôvodnou logikou
     const response = await resolve(event);
    
     // Add security headers
@@ -51,5 +75,42 @@ const securityHook: Handle = async ({ event, resolve }) => {
     return response;
 };
 
+/**
+ * SEO optimization hook
+ */
+const seoHook: Handle = async ({ event, resolve }) => {
+    if (event.url.pathname.endsWith('/') && event.url.pathname !== '/') {
+        return new Response(null, {
+            status: 301,
+            headers: {
+                location: event.url.pathname.slice(0, -1) + event.url.search
+            }
+        });
+    }
+    
+    if (event.url.pathname.startsWith('/watch/')) {
+        event.setHeaders({
+            'Cache-Control': 'public, max-age=60, s-maxage=60'
+        });
+    }
+    
+    return resolve(event);
+};
+
 // Export the combined hooks
-export const handle: Handle = securityHook;
+export const handle = sequence(authHook, securityHook, seoHook);
+
+// Type declarations for locals
+declare global {
+	namespace App {
+		interface Locals {
+			user: {
+				userId: string;
+				email: string;
+				fullName: string;
+				isVerified: boolean;
+			} | null;
+			isAuthenticated: boolean;
+		}
+	}
+}
