@@ -160,7 +160,7 @@
 	</div>
 
 	<!-- Live banner -->
-	<div class="border-t border-neutral-800 bg-black py-2 text-white">
+	<div class="border-t border-neutral-800 bg-black py-2 text-white hidden">
 		<div class="container mx-auto px-4">
 			<div class="flex items-center">
 				<span class="mr-2 rounded bg-red-600 px-2 py-0.5 text-xs font-semibold text-white"
