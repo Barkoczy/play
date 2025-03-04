@@ -5,6 +5,24 @@ import { allowedUrls, securityConfig } from '$lib/conf/securityConfig';
  * Security headers hook
  */
 const securityHook: Handle = async ({ event, resolve }) => {
+    // SEO optimalizácia - normalizácia URL (odstránenie lomítka na konci)
+    if (event.url.pathname.endsWith('/') && event.url.pathname !== '/') {
+        return new Response(null, {
+            status: 301,
+            headers: {
+                location: event.url.pathname.slice(0, -1) + event.url.search
+            }
+        });
+    }
+    
+    // Predvoľba prerendering pre SEO stránky
+    if (event.url.pathname.startsWith('/watch/')) {
+        event.setHeaders({
+            'Cache-Control': 'public, max-age=60, s-maxage=60'
+        });
+    }
+    
+    // Pokračuj s pôvodnou logikou
     const response = await resolve(event);
    
     // Add security headers

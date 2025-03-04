@@ -21,34 +21,9 @@
 </script>
 
 <header class="sticky top-0 z-10 w-full border-b border-neutral-800 bg-black text-white">
-	<div class="container mx-auto flex items-center justify-between px-4 py-2">
+	<div class="mx-auto flex items-center justify-between px-4 py-3">
 		<!-- Left section with logo and menu -->
-		<div class="flex items-center gap-4">
-			<button
-				class="rounded-full p-2 transition-colors hover:bg-neutral-800"
-				onclick={toggleMenu}
-				aria-label="Menu"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-6 w-6"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M4 6h16M4 12h16M4 18h16"
-					/>
-				</svg>
-			</button>
-
-			<a href="/" class="flex items-center gap-1 text-xl font-bold">
-				<span class="text-red-600">Play</span>
-			</a>
-		</div>
+		{@render hamburger()}
 
 		<!-- Center section with search -->
 		<div class="w-1/2">
@@ -60,7 +35,7 @@
 					class="w-full rounded-l-full border border-neutral-700 bg-neutral-900 px-4 py-2 focus:border-neutral-600 focus:outline-none"
 				/>
 				<button
-					class="rounded-r-full border border-l-0 border-neutral-700 bg-neutral-800 px-4 py-2 hover:bg-neutral-700"
+					class="rounded-r-full border border-l-0 border-neutral-700 bg-neutral-800 px-4 h-[42px] hover:bg-neutral-700"
 					aria-label="Vyhľadať"
 				>
 					<svg
@@ -201,10 +176,8 @@
   <div class="fixed left-0 top-0 bottom-0 z-50 flex">
     <div class="w-64 h-screen overflow-y-auto border-r border-neutral-800 bg-black">
       <div class="p-4">
-        <div class="mb-6 flex items-center gap-2">
-          <a href="/" class="flex items-center gap-1 text-xl font-bold">
-            <span class="text-red-600">Play</span>
-          </a>
+        <div class="mb-6 flex items-center gap-2 text-white">
+          {@render hamburger()}
         </div>
 
         <nav>
@@ -427,3 +400,33 @@
     ></button>
   </div>
 {/if}
+
+
+{#snippet hamburger()}
+  <div class="flex items-center gap-4">
+    <button
+      class="rounded-full p-2 transition-colors hover:bg-neutral-800"
+      onclick={toggleMenu}
+      aria-label="Menu"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        />
+      </svg>
+    </button>
+
+    <a href="/" class="flex items-center gap-1 text-xl font-bold">
+      <span class="text-red-600">Play</span>
+    </a>
+  </div>
+{/snippet}

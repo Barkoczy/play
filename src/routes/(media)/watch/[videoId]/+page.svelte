@@ -1,135 +1,38 @@
 <script lang="ts">
-    import { page } from '$app/stores';
     import HLSPlayer from '$lib/components/HLSPlayer.svelte';
     import VideoInfo from '@/lib/components/VideoInfo.svelte';
-    import { getVideoById } from '$lib/api/videoApi';
-    import type { Video } from '$lib/types/videoTypes';
+    import type { PageData } from './$types';
     
-    // Reaktívne stavy
-    let videoId = $state('');
-    let videoData: Video | null = $state(null);
-    let loading = $state(true);
-    let error = $state(false);
+    // Server-side injected data
+    export let data: PageData;
     
-    // Základné URL stránky
-    const siteUrl = 'https://tvoj-web.sk'; // Nahraď svojou doménou
+    // SEO meta tagy a dáta videa
+    $: seo = data.seo || {
+        title: 'Video prehrávač | Play',
+        metaDescription: 'Prehrávač videí - sledujte obľúbené videá online',
+        thumbnailUrl: '/images/default-thumbnail.jpg',
+        shareUrl: window.location.href,
+        schemaOrg: '{}'
+    };
     
-    // Funkcia na načítanie dát videa
-    async function loadVideoData() {
-        if (!videoId) {
-            videoData = null;
-            loading = false;
-            return;
-        }
-        loading = true;
-        error = false;
-        try {
-            const data = await getVideoById(videoId);
-            if (data) {
-                videoData = data;
-            } else {
-                videoData = null;
-                error = true;
-            }
-        } catch (e) {
-            console.error('Chyba pri načítaní dát videa:', e);
-            error = true;
-            videoData = null;
-        } finally {
-            loading = false;
-        }
-    }
-    
-    // Sledujeme zmeny v URL parametri
-    $effect(() => {
-        const newVideoId = $page.params.videoId || '';
-        if (newVideoId !== videoId) {
-            videoId = newVideoId;
-            loadVideoData();
-        }
-    });
-    
-    // Formátovanie počtu odberateľov
-    function formatSubscribers(count: number): string {
-        if (count >= 1000000) {
-            return (count / 1000000).toFixed(1) + 'M';
-        } else if (count >= 1000) {
-            return (count / 1000).toFixed(1) + 'K';
-        }
-        return count.toString();
-    }
-    
-    // Generovanie SEO meta informácií
-    $effect(() => {
-        if (videoData) {
-            // Aktualizácia title, ak máme dáta
-            document.title = `${videoData.name} | Play`;
-        }
-    });
-    
-    // Generovanie opisu pre meta description
-    function getMetaDescription() {
-        if (!videoData) return 'Prehrávač videí - sledujte obľúbené videá online';
-        
-        let description = videoData.desc || '';
-        // Skrátenie na max 160 znakov pre meta description
-        if (description.length > 157) {
-            description = description.substring(0, 157) + '...';
-        }
-        return description;
-    }
-    
-    // Generovanie URL pre zdieľanie
-    function getShareUrl() {
-        return `${siteUrl}/video/${videoId}`;
-    }
-    
-    // Získanie náhľadového obrázka pre video
-    function getThumbnailUrl() {
-        if (!videoData || !videoData.thumbnail) {
-            // Vráť placeholder, ak nemáme obrázok
-            return `${siteUrl}/images/default-thumbnail.jpg`;
-        }
-        return videoData.thumbnail;
-    }
-    
-    // Funkcia na vytvorenie Scheme.org dát pre video
-    function getSchemaOrgData() {
-        if (!videoData) return {};
-        
-        return {
-            "@context": "https://schema.org",
-            "@type": "VideoObject",
-            "name": videoData.name || 'Video',
-            "description": videoData.desc || '',
-            "thumbnailUrl": getThumbnailUrl(),
-            "uploadDate": videoData.uploadDate || new Date().toISOString(),
-            "contentUrl": videoData.videoUrl || '',
-            "embedUrl": getShareUrl(),
-            "duration": videoData.duration || '',
-            "author": {
-                "@type": "Person",
-                "name": videoData.channel?.name || ''
-            }
-        };
-    }
+    const videoData = data.video;
 </script>
 
 <svelte:head>
-    <!-- Základné SEO meta tagy -->
-    <title>{videoData?.name ? `${videoData.name} | Play` : 'Video prehrávač | Play'}</title>
-    <meta name="description" content={getMetaDescription()} />
+    <title>{seo.title}</title>
+    <meta name="description" content={seo.metaDescription} />
     
-    <!-- Kanonická URL adresa - dôležité pre SEO -->
-    <link rel="canonical" href={getShareUrl()} />
+    <!-- Kanonická URL -->
+    <link rel="canonical" href={seo.shareUrl} />
     
     <!-- Open Graph meta tagy pre Facebook -->
     <meta property="og:site_name" content="Play" />
-    <meta property="og:url" content={getShareUrl()} />
+    <meta property="og:url" content={seo.shareUrl} />
     <meta property="og:title" content={videoData?.name || 'Video prehrávač'} />
-    <meta property="og:description" content={getMetaDescription()} />
-    <meta property="og:image" content={getThumbnailUrl()} />
+    <meta property="og:description" content={seo.metaDescription} />
+    <meta property="og:image" content={seo.thumbnailUrl} />
     <meta property="og:type" content="video.other" />
+    
     {#if videoData?.videoUrl}
         <meta property="og:video" content={videoData.videoUrl} />
         <meta property="og:video:secure_url" content={videoData.videoUrl} />
@@ -141,29 +44,18 @@
     <!-- Twitter Card meta tagy -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={videoData?.name || 'Video prehrávač'} />
-    <meta name="twitter:description" content={getMetaDescription()} />
-    <meta name="twitter:image" content={getThumbnailUrl()} />
+    <meta name="twitter:description" content={seo.metaDescription} />
+    <meta name="twitter:image" content={seo.thumbnailUrl} />
     
     <!-- Ďalšie užitočné meta tagy -->
     <meta name="keywords" content={`video, play, ${videoData?.name || ''}, ${videoData?.channel?.name || ''}`} />
     
-    <!-- Štruktúrované dáta pre Google (Schema.org) - OPRAVENÉ s podmienkovým vykreslením -->
-    {#if videoData}
-        {@html `<script type="application/ld+json">${JSON.stringify(getSchemaOrgData())}</script>`}
-    {/if}
+    <!-- Štruktúrované dáta pre Google (Schema.org) -->
+    {@html `<script type="application/ld+json">${seo.schemaOrg}</script>`}
 </svelte:head>
 
 <div class="w-full max-w-none bg-black">
-    {#if loading}
-        <!-- Loading indicator -->
-        <div class="mx-auto max-w-6xl p-4">
-            <div class="flex h-64 items-center justify-center">
-                <div
-                    class="h-12 w-12 animate-spin rounded-full border-4 border-red-500 border-t-transparent"
-                ></div>
-            </div>
-        </div>
-    {:else if error || !videoData}
+    {#if !videoData}
         <!-- Error message -->
         <div class="mx-auto max-w-6xl p-4">
             <div class="rounded-lg border border-red-800 bg-red-900/30 p-6">
@@ -178,6 +70,7 @@
             <div class="mx-auto max-w-[1536px] aspect-w-16 aspect-h-9">
                 <HLSPlayer videoUrl={videoData.videoUrl} autoplay={true} live={videoData.live} />
             </div>
+            
             <!-- Video information -->
             <VideoInfo
                 name={videoData.name}
@@ -186,13 +79,13 @@
                 channel={videoData.channel}
             />
             
-            <!-- Social Sharing Buttons - OPRAVENÉ s konzistentným štýlom -->
+            <!-- Social Sharing Buttons -->
             <div class="mx-auto max-w-6xl py-8">
                 <div class="flex justify-center gap-3">
                     <!-- Facebook share button -->
                     <button 
                         class="inline-flex items-center justify-center rounded-full bg-black py-2 px-4 text-white border border-neutral-700 hover:bg-neutral-800 transition"
-                        onclick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}`, '_blank')}
+                        onclick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(seo.shareUrl)}`, '_blank')}
                         title="Zdieľať na Facebooku"
                     >
                         <svg class="h-5 w-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -204,11 +97,7 @@
                     <!-- Twitter share button -->
                     <button 
                         class="inline-flex items-center justify-center rounded-full bg-black py-2 px-4 text-white border border-neutral-700 hover:bg-neutral-800 transition"
-                        onclick={() => {
-                            if (videoData) {
-                                window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(getShareUrl())}&text=${encodeURIComponent(videoData.name)}`, '_blank');
-                            }
-                        }}
+                        onclick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(seo.shareUrl)}&text=${encodeURIComponent(videoData.name)}`, '_blank')}
                         title="Zdieľať na Twitteri"
                     >
                         <svg class="h-5 w-5 text-sky-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -222,15 +111,13 @@
                         class="inline-flex items-center justify-center rounded-full bg-black py-2 px-4 text-white border border-neutral-700 hover:bg-neutral-800 transition"
                         onclick={() => {
                             if (navigator.share) {
-                                if (videoData) {
-                                    navigator.share({
-                                        title: videoData.name,
-                                        text: videoData.desc,
-                                        url: getShareUrl(),
-                                    });
-                                }
+                                navigator.share({
+                                    title: videoData.name,
+                                    text: videoData.desc,
+                                    url: seo.shareUrl,
+                                });
                             } else {
-                                navigator.clipboard.writeText(getShareUrl());
+                                navigator.clipboard.writeText(seo.shareUrl);
                                 alert('URL skopírovaná do schránky!');
                             }
                         }}
