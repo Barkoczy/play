@@ -20,7 +20,7 @@
 	}
 </script>
 
-<header class="sticky top-0 z-10 w-full border-b border-neutral-800 bg-black text-white">
+<header class="fixed top-0 right-0 left-0 z-[100] w-full border-b border-neutral-800 bg-black text-white">
 	<div class="mx-auto flex items-center justify-between px-4 py-2">
 		<!-- Left section with logo and menu -->
 		{@render hamburger()}

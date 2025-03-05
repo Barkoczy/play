@@ -7,7 +7,7 @@
 
 <Header />
 
-<div class="min-h-screen bg-black text-white">
+<div class="min-h-screen pt-[58px] bg-black text-white">
 	<main class="mx-auto">
 		{@render children()}
 	</main>
