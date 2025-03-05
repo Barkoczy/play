@@ -2,39 +2,54 @@ import { PUBLIC_BASE_URL } from '$env/static/public';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
+const NOT_FOUND_VIDEO_DATA = {
+    video: null,
+    seo: {
+        title: 'Video nenájdené | Play',
+        metaDescription: 'Požadované video sa nenašlo.',
+        thumbnailUrl: 'https://placehold.co/600x400',
+        shareUrl: '',
+        schemaOrg: null
+    }
+};
+
 export const load: PageServerLoad = async ({ params, fetch }) => {
     const videoId = params.videoId;
-    
+   
     if (!videoId) {
-        return {
-            video: null
-        };
+        return NOT_FOUND_VIDEO_DATA;
     }
-    
+   
     try {
         const response = await fetch(`/api/videos?id=${videoId}`);
-        
+       
         if (!response.ok) {
-            throw error(response.status, 'Video nenájdené');
+            // Ak video nie je nájdené (404), vráťte preddefinovaný objekt
+            if (response.status === 404) {
+                return NOT_FOUND_VIDEO_DATA;
+            }
+            
+            // Pre iné chyby stále vyhoďte pôvodnú chybu
+            throw error(response.status, 'Chyba pri načítavaní videa');
         }
-        
+       
         const videoData = await response.json();
-        
+       
         // Pripravenie SEO metadát pre stránku
         const siteUrl = PUBLIC_BASE_URL || 'http://localhost:5173';
-        
+       
         // Vytvorenie meta description
         let metaDescription = videoData.desc || '';
         if (metaDescription.length > 157) {
             metaDescription = metaDescription.substring(0, 157) + '...';
         }
-        
+       
         // Získanie URL pre obrázok
         const thumbnailUrl = videoData.thumbnail || 'https://placehold.co/600x400';
-        
+       
         // Získanie URL pre zdieľanie
         const shareUrl = `${siteUrl}/watch/${videoId}`;
-        
+       
         // Vytvorenie Schema.org dát
         const schemaOrg = {
             "@context": "https://schema.org",
@@ -51,7 +66,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
                 "name": videoData.channel?.name || ''
             }
         };
-        
+       
         return {
             video: videoData,
             seo: {
@@ -63,7 +78,10 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
             }
         };
     } catch (e) {
+        // Pre akékoľvek iné nečakané chyby (napr. sieťové)
         console.error('Chyba pri načítaní dát videa:', e);
-        throw error(500, 'Nepodarilo sa načítať dáta videa');
+        
+        // Vrátenie preddefinovaného objektu pre chybu
+        return NOT_FOUND_VIDEO_DATA;
     }
 };

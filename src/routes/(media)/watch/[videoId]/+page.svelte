@@ -161,7 +161,7 @@
 
 <style>
 	.video-wrapper {
-		max-width: 1200px;
+		max-width: 1310px;
 	}
 	@media screen and (min-height: 1200px) {
 		.video-wrapper {

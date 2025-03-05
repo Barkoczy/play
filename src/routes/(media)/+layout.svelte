@@ -8,7 +8,7 @@
 <Header />
 
 <div class="min-h-screen bg-black text-white">
-	<main class="mx-auto p-4">
+	<main class="mx-auto">
 		{@render children()}
 	</main>
 </div>
